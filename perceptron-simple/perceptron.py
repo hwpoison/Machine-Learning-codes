@@ -9,12 +9,10 @@ class Perceptron():
     def __init__(self):
         super(Perceptron, self).__init__()
         self.input_length = 4
-        self.output_length = 1
         self.bias = 1.0
         self.learning_rate = 0.01
         self.epoch_train = 100
-        self.synapse_weights = np.random.rand(self.input_length,
-                                              self.output_length)
+        self.synapse_weights = np.random.rand(self.input_length)
 
     def forward(self, inputs):
         # Input values into perceptron and generate a output
@@ -37,7 +35,7 @@ class Perceptron():
                 error = expected - output
                 if(output != expected):
                     update_value = self.learning_rate * error * ts_input
-                    self.synapse_weights.T[0] += update_value
+                    self.synapse_weights += update_value
 
 
 if __name__ == '__main__':
