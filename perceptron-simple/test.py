@@ -34,7 +34,7 @@ def generate_iris_dataset():
 
 # instance perceptron
 perceptron = perceptron.Perceptron()
-perceptron.input_length = 3  # set input length
+perceptron.input_length = 4  # set input length
 
 # prepare dataset
 iris_dataset = generate_iris_dataset()
