@@ -11,7 +11,6 @@ class Perceptron():
         self.input_length = 4
         self.bias = 1.0
         self.learning_rate = 0.01
-        self.epoch_train = 100
         self.synapse_weights = np.random.rand(self.input_length)
 
     def forward(self, inputs):
@@ -27,15 +26,24 @@ class Perceptron():
         # Activation function type step
         return 1 if input > 1 else 0
 
-    def train(self, ts_inputs, ts_outputs):
+    def train(self, ts_inputs, ts_outputs, epochs=None):
         # Learn dataset
-        for i in range(self.epoch_train):
+        epoch_count = 0  # for specific number of epochs
+        while True:
+            count_error = 0
             for ts_input, expected in zip(ts_inputs, ts_outputs):
                 output = self.predict(ts_input)
                 error = expected - output
                 if(output != expected):
+                    # if output != expected output, update weights
+                    count_error += 1
                     update_value = self.learning_rate * error * ts_input
                     self.synapse_weights += update_value
+
+            epoch_count += 1
+            # if there are no more errors why keep adjusting?
+            if count_error == 0 or epoch_count == epochs:
+                break
 
 
 if __name__ == '__main__':
