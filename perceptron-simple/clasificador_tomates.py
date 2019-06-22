@@ -22,19 +22,23 @@ ts_outputs = np.array([0, 1, 1, 0, 1, 0]).T
 
 # instanciar perceptron
 perceptron = Perceptron()
+print("Inicializando pesos...")
 perceptron.synapse_weights = [0, 0, 0, 0]
+print("Asignando tasa de aprendizaje y bias")
 perceptron.learn_rate = 0.01
 perceptron.bias = 1.0
 
 # entrenamiento
+print("Entrenando...")
 perceptron.train(ts_inputs, ts_outputs)
-
+print("Entrenamiento finalizado...")
 
 def detect_tomate(salida):
     if(salida):
         return "Tomate maduro"
     else:
         return "Tomate Verde"
+print("Inserte las propiedades de su tomate!:")
 while True:
     try:
         verdor = float(input("Cantidad de verdor:"))
