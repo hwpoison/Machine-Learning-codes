@@ -43,6 +43,7 @@ class Perceptron():
             epoch_count += 1
             # if there are no more errors why keep adjusting?
             if count_error == 0 or epoch_count == epochs:
+                print(f"Trained in {epoch_count} epochs")
                 break
 
 

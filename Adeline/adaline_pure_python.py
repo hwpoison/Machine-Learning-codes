@@ -20,23 +20,23 @@ class Adaline():
         self.all_errors = []
 
     def dot(self, a, b):
-    	# zigma
+        # zigma
         return sum(x*z for x, z in zip(a, b))
 
     def forward(self, inputs):
-    	# propagación
+        # propagación
         return self.dot(self.synapse_weights, inputs) + self.bias
 
     def predict(self, inputs):
         return 0 if self.forward(inputs) < 0.0 else 1
 
     def activation(self, inputs):
-    	# activación
+        # activación
         return self.predict(inputs)
 
     def train(self, input_data, expected_output, epochs=10):
-    	# Entrenamiento por gradiente descendente estocastica
-        
+        # Entrenamiento por gradiente descendente estocastica
+
         # Se inicializan los pesos
         self.synapse_weights = [random.uniform(
             0.001, 0.001) for i in range(0, self.input_length)]
@@ -48,7 +48,7 @@ class Adaline():
             batch = [i for i in range(len(expected_output)-1)]
             shuffle(batch)
             for element_index in batch:
-            	# Se calcula el peso postsinaptico
+                # Se calcula el peso postsinaptico
                 output = self.forward(input_data[element_index])
                 # Se calcular el error
                 error = expected_output[element_index] - output
@@ -60,14 +60,16 @@ class Adaline():
                     self.synapse_weights[w] += update_value
                     self.bias += self.learning_rate * error
             # Se calcula el error cuadratico medio / función de coste
-            cost = [(e-i)**2 for e, i in zip(expected_output, list(map(self.forward,input_data)))]
+            cost = [(e-i)**2 for e, i in zip(expected_output,
+                                             list(map(self.forward, input_data)))]
             sum_cost = sum(cost) / 2.0
             self.all_errors.append(sum_cost)
         time_final = time.time() - time_init
         print(f"Trained in:{ time_final } seconds.\nMin Error: {sum_cost}")
-   
+
     def show_error(self):
         print(f"Min error:{self.all_errors[-1:][0]}")
+
 
 if __name__ == '__main__':
     # Dataset de prueba

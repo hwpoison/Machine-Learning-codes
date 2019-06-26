@@ -54,8 +54,8 @@ class Adaline():
             sum_cost = (cost ** 2).sum() / 2.0
             self.all_errors.append(sum_cost)
         time_final = time.time() - time_init
-        print(f"Trained in:{ time_final } seconds.\nMin Error: {sum_cost}")
-    
+        print(f"Trained in:{ time_final } seconds and {epochs} epochs.\nMin Error: {sum_cost}")
+
     def show_error(self):
         # Imprime los errores
         plt.plot(self.all_errors)
@@ -75,12 +75,12 @@ if __name__ == '__main__':
                           [0.3, 0.4, 0.3, 0.6]])
 
     ts_outputs = np.array([0, 1, 1, 0, 1])
-    
+
     # Inicialización del modelo
     adaline = Adaline(input_length=4, learning_rate=.01)
 
     # Entrenamiento
-    adaline.train(ts_inputs, ts_outputs, 2)
+    adaline.train(ts_inputs, ts_outputs, 5)
 
     # Testear modelo
     test_dataset = list(zip(ts_inputs, ts_outputs))
