@@ -23,45 +23,50 @@ class Adaline():
         # zigma
         return sum(x*z for x, z in zip(a, b))
 
-    def forward(self, inputs):
+    def forward(self, x):
         # propagación
-        return self.dot(self.synapse_weights, inputs) + self.bias
+        return self.dot(self.synapse_weights, x) + self.bias
 
-    def predict(self, inputs):
-        return 0 if self.forward(inputs) < 0.0 else 1
+    def predict(self, x):
+        return self.activation(x)
 
-    def activation(self, inputs):
+    def activation(self, x):
         # activación
-        return self.predict(inputs)
+        return 0 if self.forward(x) < 0.0 else 1
 
-    def train(self, input_data, expected_output, epochs=10):
+    def train(self, X_data, y_data, epochs=10):
+        """
+            X_data: input data
+            y_data: expected data
+            epochs: number of cycles
+        """
         # Entrenamiento por gradiente descendente estocastica
 
         # Se inicializan los pesos
         self.synapse_weights = [uniform(
             0.001, 0.001) for i in range(0, self.input_length)]
-        expected_output = [-1 if i == 0 else 1 for i in expected_output]
+        y_data = [-1 if i == 0 else 1 for i in y_data]
         time_init = time.time()
         # Comienzo de ciclos de aprendizaje
         for epoch in range(epochs):
             # Se elige un lote y se desordena
-            batch = [i for i in range(len(expected_output)-1)]
+            batch = [i for i in range(len(y_data)-1)]
             shuffle(batch)
             for element_index in batch:
                 # Se calcula el peso postsinaptico
-                output = self.forward(input_data[element_index])
+                output = self.forward(X_data[element_index])
                 # Se calcular el error
-                error = expected_output[element_index] - output
+                error = y_data[element_index] - output
                 # Se actualizan los pesos y el sesgo
                 # en función a la gradiente descendente
                 for w in range(0, self.input_length):
                     update_value = self.learning_rate * \
-                        self.dot([input_data[element_index][w]], [error])
+                        self.dot([X_data[element_index][w]], [error])
                     self.synapse_weights[w] += update_value
                     self.bias += self.learning_rate * error
                     # Se calcula el error cuadratico medio / función de coste
-                cost = [(e-i)**2 for e, i in zip(expected_output,
-                                             list(map(self.forward, input_data)))]
+                cost = [(e-i)**2 for e, i in zip(y_data,
+                                                 list(map(self.forward, X_data)))]
                 sum_cost = sum(cost) / 2.0
                 self.all_errors.append(sum_cost)
         time_final = time.time() - time_init
@@ -73,24 +78,24 @@ class Adaline():
 
 if __name__ == '__main__':
     # Dataset de prueba
-    ts_inputs = [[0.9, 0.1, 0.7, 0.2],
+    input_data = [[0.9, 0.1, 0.7, 0.2],
 
-                 [0.0, 0.9, 0.3, 0.8],
+                  [0.0, 0.9, 0.3, 0.8],
 
-                 [0.2, 1.0, 0.0, 0.7],
+                  [0.2, 1.0, 0.0, 0.7],
 
-                 [1.0, 0.0, 0.8, 0.1],
+                  [1.0, 0.0, 0.8, 0.1],
 
-                 [0.3, 0.4, 0.3, 0.6]]
+                  [0.3, 0.4, 0.3, 0.6]]
 
-    ts_outputs = [0, 1, 1, 0, 1]
+    expect_data = [0, 1, 1, 0, 1]
     # Inicialización del modelo
     adaline = Adaline(input_length=4, learning_rate=.01)
     # Entrenamiento
-    adaline.train(ts_inputs, ts_outputs, 5)
+    adaline.train(input_data, expect_data, 5)
 
     # Testear modelo
-    test_dataset = list(zip(ts_inputs, ts_outputs))
+    test_dataset = list(zip(input_data, expect_data))
     shuffle(test_dataset)
     for ts_input, expected in test_dataset:
         output = adaline.predict(ts_input)

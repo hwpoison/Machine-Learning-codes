@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import numpy as np
-from adaline_pure_python import Adaline
+from adaline import Adaline
 
 """
 Iris setosa:
@@ -42,7 +42,7 @@ ts_output_iris = np.array([specs[1]
                            for specs in iris_dataset])  # expected output data
 
 # train
-adaline.train(ts_input_iris, ts_output_iris, 2)
+adaline.train(ts_input_iris, ts_output_iris, 10)
 
 # test al dataset
 

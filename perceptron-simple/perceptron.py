@@ -7,38 +7,47 @@ __autor__ = 'srbill1996'
 
 class Perceptron():
 
-    def __init__(self):
+    def __init__(self,
+                 input_length=4,
+                 learning_rate=0.01,
+                 bias=1.0):
         super(Perceptron, self).__init__()
-        self.input_length = 4
-        self.bias = 1.0
-        self.learning_rate = 0.01
-        self.synapse_weights = np.random.rand(self.input_length)
+        self.input_length = input_length
+        self.learning_rate = learning_rate
+        self.bias = bias
+        self.synapse_weights = []
 
-    def forward(self, inputs):
+    def zigma(self, x):
         # Input values into perceptron and generate a output
-        z = np.dot(inputs, self.synapse_weights) + self.bias
+        z = np.dot(x, self.synapse_weights) + self.bias
         return z
 
-    def predict(self, inputs):
-        result = self.forward(inputs)
-        return self.activation_function(result)
+    def predict(self, x):
+        return self.activation(x)
 
-    def activation_function(self, input):
+    def activation(self, x):
         # Activation function type step
-        return 1 if input > 1 else 0
+        return 1 if self.zigma(x) > 1 else 0
 
-    def train(self, ts_inputs, ts_outputs, epochs=None):
-        # Learn dataset
+    def train(self, X_data, y_data, epochs=None):
+        """
+            X_data: input data
+            y_data: expected data
+            epochs: number of cycles
+        """
+        # Initialize weights
+        self.synapse_weights = np.random.rand(self.input_length)
         epoch_count = 0  # for specific number of epochs
+        # Initialize train
         while True:
             count_error = 0
-            for ts_input, expected in zip(ts_inputs, ts_outputs):
-                output = self.predict(ts_input)
-                error = expected - output
-                if(output != expected):
-                    # if output != expected output, update weights
+            for x_input, y_expect in zip(X_data, y_data):
+                output = self.predict(x_input)
+                error = y_expect - output
+                if(output != y_expect):
+                    # if output != y_expect output, update weights
                     count_error += 1
-                    update_value = self.learning_rate * error * ts_input
+                    update_value = self.learning_rate * error * x_input
                     self.synapse_weights += update_value
 
             epoch_count += 1
@@ -50,23 +59,23 @@ class Perceptron():
 
 if __name__ == '__main__':
     # dataset test example
-    ts_inputs = np.array([[0, 0, 1, 0],
-                          [1, 1, 1, 0],
-                          [1, 0, 1, 1],
-                          [0, 1, 1, 1],
-                          [0, 1, 0, 1],
-                          [1, 1, 1, 1],
-                          [0, 0, 0, 0]])
+    input_data = np.array([[0, 0, 1, 0],
+                           [1, 1, 1, 0],
+                           [1, 0, 1, 1],
+                           [0, 1, 1, 1],
+                           [0, 1, 0, 1],
+                           [1, 1, 1, 1],
+                           [0, 0, 0, 0]])
 
-    ts_outputs = np.array([0, 1, 1, 0, 0, 1, 0]).T
+    expect_data = np.array([0, 1, 1, 0, 0, 1, 0]).T
     # instance perceptron
     perceptron = Perceptron()
 
     # train
-    perceptron.train(ts_inputs, ts_outputs)
+    perceptron.train(input_data, expect_data)
 
     # test
-    for ts_input, expected in zip(ts_inputs, ts_outputs):
+    for ts_input, expected in zip(input_data, expect_data):
         output = perceptron.predict(ts_input)
         expected = 'OK' if expected == output else 'FAIL'
         print(f'Input:{ts_input} Output: {output} = {expected}')
