@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from __future__ import print_function
-from random import choice, randint, shuffle
 import matplotlib.pyplot as plt
+from random import shuffle
 import numpy as np
 import time
 
@@ -36,7 +36,7 @@ class Adaline():
             high=0.001, size=(self.input_length, 1))
         expected_output = np.where(expected_output == 0, -1., 1.)
         # Entrenamiento por gradiente descendente estocastica
-        time_init = time.time()
+        time_init = time.time() 
         for epoch in range(epochs):
             # Se elige un lote y se desordena
             batch = [[i] for i in range(0, len(expected_output)-1)]
@@ -51,10 +51,10 @@ class Adaline():
                 # Se actualizan los pesos y el sesgo
                 self.synapse_weights += update_value
                 self.bias += self.learning_rate * error.sum()
-            # Se calcula el error cuadratico medio / función de coste
-            cost = expected_output - self.forward(input_data).T[0]
-            sum_cost = (cost ** 2).sum() / 2.0
-            self.all_errors.append(sum_cost)
+                # Se calcula el error cuadratico medio / función de coste
+                cost = expected_output - self.forward(input_data).T[0]
+                sum_cost = (cost ** 2).sum() / 2.0
+                self.all_errors.append(sum_cost)
         time_final = time.time() - time_init
         print(f"Trained in:{ time_final } seconds and {epochs} epochs.\nMin Error: {sum_cost}")
 

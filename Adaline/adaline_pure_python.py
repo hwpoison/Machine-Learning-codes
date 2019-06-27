@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 from __future__ import print_function
 from random import shuffle, uniform
-import random
 import time
 
 __autor__ = 'srbill1996'
@@ -39,7 +38,7 @@ class Adaline():
         # Entrenamiento por gradiente descendente estocastica
 
         # Se inicializan los pesos
-        self.synapse_weights = [random.uniform(
+        self.synapse_weights = [uniform(
             0.001, 0.001) for i in range(0, self.input_length)]
         expected_output = [-1 if i == 0 else 1 for i in expected_output]
         time_init = time.time()
@@ -60,11 +59,11 @@ class Adaline():
                         self.dot([input_data[element_index][w]], [error])
                     self.synapse_weights[w] += update_value
                     self.bias += self.learning_rate * error
-            # Se calcula el error cuadratico medio / función de coste
-            cost = [(e-i)**2 for e, i in zip(expected_output,
+                    # Se calcula el error cuadratico medio / función de coste
+                cost = [(e-i)**2 for e, i in zip(expected_output,
                                              list(map(self.forward, input_data)))]
-            sum_cost = sum(cost) / 2.0
-            self.all_errors.append(sum_cost)
+                sum_cost = sum(cost) / 2.0
+                self.all_errors.append(sum_cost)
         time_final = time.time() - time_init
         print(f"Trained in:{ time_final } seconds.\nMin Error: {sum_cost}")
 

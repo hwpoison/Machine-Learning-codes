@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 from __future__ import print_function
-import random
+from random import uniform
 
 __autor__ = 'srbill1996'
 
@@ -12,7 +12,7 @@ class Perceptron():
         self.input_length = 4
         self.bias = 1.0
         self.learning_rate = 0.01
-        self.synapse_weights = [random.uniform(
+        self.synapse_weights = [uniform(
             0.001, 0.001) for i in range(0, self.input_length)]
 
     def dot(self, a, b):

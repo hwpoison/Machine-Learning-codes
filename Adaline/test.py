@@ -42,7 +42,7 @@ ts_output_iris = np.array([specs[1]
                            for specs in iris_dataset])  # expected output data
 
 # train
-adaline.train(ts_input_iris, ts_output_iris, 10)
+adaline.train(ts_input_iris, ts_output_iris, 2)
 
 # test al dataset
 
