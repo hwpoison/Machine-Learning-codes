@@ -1,7 +1,8 @@
 #!/usr/bin/env python
-import time
-import random
+from __future__ import print_function
 from random import shuffle, uniform
+import random
+import time
 
 __autor__ = 'srbill1996'
 

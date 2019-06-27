@@ -1,8 +1,10 @@
 #!/usr/bin/env python
-import time
-import numpy as np
-import matplotlib.pyplot as plt
+from __future__ import print_function
 from random import choice, randint, shuffle
+import matplotlib.pyplot as plt
+import numpy as np
+import time
+
 __autor__ = 'srbill1996'
 
 
