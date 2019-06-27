@@ -5,6 +5,7 @@ import numpy as np
 # dataset ficticio para clasificacion de maduración de tomates
 # verdor| rojez | consistencia | suavidad
 
+
 #entradas de muestras
 ts_inputs = np.array([[0.9, 0.1, 0.7, 0.2],
 
