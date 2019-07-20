@@ -65,12 +65,11 @@ class Adaline():
                     self.synapse_weights[w] += update_value
                     self.bias += self.learning_rate * error
                     # Se calcula el error cuadratico medio / función de coste
-                cost = [(e-i)**2 for e, i in zip(y_data,
-                                                 list(map(self.forward, X_data)))]
-                sum_cost = sum(cost) / 2.0
-                self.all_errors.append(sum_cost)
+                MSE = sum([(e-i)**2 for e, i in zip(y_data,
+                                                 list(map(self.forward, X_data)))]) / 2.0
+                self.all_errors.append(MSE)
         time_final = time.time() - time_init
-        print(f"Trained in:{ time_final } seconds.\nMin Error: {sum_cost}")
+        print(f"Trained in:{ time_final } seconds.\nMin Error: {MSE}")
 
     def show_error(self):
         print(f"Min error:{self.all_errors[-1:][0]}")

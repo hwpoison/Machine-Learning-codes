@@ -50,18 +50,16 @@ class Adaline():
                 output = self.forward(X_data[element_index])
                 # Se calcular el error
                 error = y_data[element_index] - output
-                # Se calcula la gradiente descendente
                 update_value = self.learning_rate * \
                     X_data[element_index].T.dot(error)
                 # Se actualizan los pesos y el sesgo
                 self.synapse_weights += update_value
                 self.bias += self.learning_rate * error.sum()
                 # Se calcula el error cuadratico medio / función de coste
-                cost = y_data - self.forward(X_data).T[0]
-                sum_cost = (cost ** 2).sum() / 2.0
-                self.all_errors.append(sum_cost)
+                MSE = (y_data - self.forward(X_data).T[0] ** 2).sum()
+                self.all_errors.append(MSE)
         time_final = time.time() - time_init
-        print(f"Trained in:{ time_final } seconds and {epochs} epochs.\nMin Error: {sum_cost}")
+        print(f"Trained in:{ time_final } seconds and {epochs} epochs.\nMin Error: {MSE}")
 
     def show_error(self):
         # Imprime los errores
@@ -87,7 +85,7 @@ if __name__ == '__main__':
     adaline = Adaline(input_length=4, learning_rate=.01)
 
     # Entrenamiento
-    adaline.train(input_data, expect_data, 5)
+    adaline.train(input_data, expect_data, 100)
 
     # Testear modelo
     test_dataset = list(zip(input_data, expect_data))
