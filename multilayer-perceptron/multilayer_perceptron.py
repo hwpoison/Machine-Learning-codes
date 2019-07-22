@@ -3,10 +3,13 @@ import matplotlib.pyplot as plt
 
 __autor__ = 'srbill1996'
 
+
 class NeuronLayer():
     def __init__(self, inputs_length, neurons_amount):
-        self.synaptic_weights = 2 * np.random.random((inputs_length, neurons_amount)) - 1
+        self.synaptic_weights = 2 * \
+            np.random.random((inputs_length, neurons_amount)) - 1
         self.bias = [0 for i in range(neurons_amount)]
+
 
 class NeuralNetwork():
     def __init__(self, layer_model):
@@ -34,11 +37,11 @@ class NeuralNetwork():
             delta = layer_error * self.sigmoid_derivate(outputs[i+1])
             layer_error = delta.dot(self.layers[i].synaptic_weights.T)
             gradient = outputs[i].T.dot(delta)
-            #gradient descendent
+            # gradient descendent
             self.layers[i].synaptic_weights += gradient * self.learn_rate
            # print(self.layers[i].bias, delta)
-            self.layers[i].bias += delta[-1] * self.learn_rate
-    
+            self.layers[i].bias += delta.sum(axis=0) * self.learn_rate
+
     def train(self, training_set_inputs,
               training_set_outputs,
               epoch_number=False):
@@ -67,7 +70,7 @@ class NeuralNetwork():
         return output_stack
 
     def input(self, input):
-        return self.forward(input)[-1:]
+        return self.forward(input)[-1]
 
     def argmax(self, input):
         return np.argmax(self.input(input))
@@ -95,10 +98,9 @@ if __name__ == "__main__":
         outputs = np.array([[0],  [1],   [1],   [0]])
 
         # entrenamiento
-        neural_network.train(inputs, outputs, epoch_number=1000)
-
+        neural_network.train(inputs, outputs, epoch_number=1200)
+        neural_network.learn_rate = 0.01
         # test
-        print(neural_network.input([inputs]))
         print(neural_network.input([0, 1]))  # se espera 0.9
         neural_network.show_error()
 
