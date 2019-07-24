@@ -41,11 +41,9 @@ model = [
     NeuronLayer(4, 8),
     NeuronLayer(8, 3)
 ]
-
-
 neural_network = NeuralNetwork(model)
 neural_network.learn_rate = 0.01
-neural_network.train(ts_input_iris, ts_output_iris, 7000)
+neural_network.train(ts_input_iris, ts_output_iris, 5000)
 
 print(neural_network.errors[-1])
 
@@ -67,4 +65,4 @@ def test_all():
 
 
 test_all()
-# neural_network.show_error()
+neural_network.show_error()

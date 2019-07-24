@@ -13,7 +13,7 @@ GRID_HEIGHT = 6
 HIDDEN_LAYER = 10
 # Train settings
 LEARN_RATE = 0.5
-TRAIN_EPOCHS = 2000
+TRAIN_EPOCHS = 2000 #False: try get MSE
 ###################
 ##GUI Options##
 CELL_SIZE = 6
