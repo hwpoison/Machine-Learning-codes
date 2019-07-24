@@ -43,7 +43,7 @@ model = [
 ]
 neural_network = NeuralNetwork(model)
 neural_network.learn_rate = 0.01
-neural_network.train(ts_input_iris, ts_output_iris, 5000)
+neural_network.train(ts_input_iris, ts_output_iris, 6000)
 
 print(neural_network.errors[-1])
 

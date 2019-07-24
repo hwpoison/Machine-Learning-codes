@@ -61,7 +61,7 @@ class NeuralNetwork():
 	def forward(self, input):
 		output_stack = []
 		for layer in self.layers:
-			z = np.dot(input, layer.synaptic_weights) + layer.bias[0]
+			z = np.dot(input, layer.synaptic_weights) + layer.bias
 			out = self.sigmoid_function(z)
 			output_stack.append(out)
 			input = out
