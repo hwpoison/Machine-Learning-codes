@@ -5,15 +5,24 @@ import multilayer_perceptron as perceptron
 __autor__ = 'srbill1996'
 __date__ = '20/07/2019'
 
+"""
+Controles:
+-Con el click del mouse se selecciona una celda.
+-Presionando una vez el click derecho, se activa el modo selección,
+por donde pase el puntero se seleccionara una celda o se desactivará si esta
+ya estaba previamente activada.
+-Presionandolo otra vez este se desactiva.
+"""
+
 ##MLP  Parameters##
 # Input matrix
-GRID_WIDTH = 6
-GRID_HEIGHT = 6
+GRID_WIDTH = 8
+GRID_HEIGHT = 8
 # Layer
 HIDDEN_LAYER = 10
 # Train settings
 LEARN_RATE = 0.5
-TRAIN_EPOCHS = 2000 #False: try get MSE
+TRAIN_EPOCHS = 2500
 ###################
 ##GUI Options##
 CELL_SIZE = 6
