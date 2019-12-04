@@ -78,7 +78,7 @@ class NeuralNetwork():
 
 if __name__ == "__main__":
 
-	# Capa 1 = capa con 2 entradas a 5 neuronas conectadas a 1 neurona
+	# Capa 1 = capa con 2 entradas conectadas a 8neuronas que a la vez se conectan a 1 neurona de salida
 	layer_model = [
 		NeuronLayer(2, 8),
 		NeuronLayer(8, 1)
