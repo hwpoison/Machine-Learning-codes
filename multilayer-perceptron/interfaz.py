@@ -2,7 +2,7 @@ from tkinter import *
 import numpy as np
 import multilayer_perceptron as perceptron
 
-__autor__ = 'srbill1996'
+__autor__ = 'hwpoison'
 __date__ = '20/07/2019'
 
 """
@@ -29,7 +29,7 @@ CELL_SIZE = 6
 COLOR_ENABLED = '#1EFF1A'
 COLOR_DISABLED = '#35A4E7'
 
-TEXT_TITLE = "MLP by srbill1996"
+TEXT_TITLE = "MLP by " + __autor__
 TEXT_TRAIN = "Entrenar"
 TEXT_PREDICT = "Predecir"
 
@@ -219,8 +219,8 @@ class App(object):
         #   con (GRID_WEIGHT*GRID_HEIGHT) entradas cada una
         # 2: salida de (GRID_WEIGHT*GRID_HEIGHT) neuronas
         model = [
-            perceptron.NeuronLayer(input_len, HIDDEN_LAYER),
-            perceptron.NeuronLayer(HIDDEN_LAYER, input_len),
+            perceptron.NeuralLayer(input_len, HIDDEN_LAYER),
+            perceptron.NeuralLayer(HIDDEN_LAYER, input_len),
         ]
         print(f"Red Neuronal inicializada.")
         self.Perceptron = perceptron.NeuralNetwork(model)

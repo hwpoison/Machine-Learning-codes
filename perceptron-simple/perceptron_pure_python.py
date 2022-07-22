@@ -2,7 +2,7 @@
 from __future__ import print_function
 from random import uniform
 
-__autor__ = 'srbill1996'
+__autor__ = 'hwpoison'
 
 
 class Perceptron():

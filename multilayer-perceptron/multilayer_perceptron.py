@@ -1,10 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-__autor__ = 'srbill1996'
+__autor__ = 'hwpoison'
 
 
-class NeuronLayer():
+class NeuralLayer():
 	def __init__(self, inputs_length, neurons_amount):
 		self.synaptic_weights = np.random.random((inputs_length, neurons_amount))
 		self.bias = [-1.5 for i in range(neurons_amount)]
@@ -74,29 +74,3 @@ class NeuralNetwork():
 		# Imprime los errores
 		plt.plot(self.errors)
 		plt.show()
-
-
-if __name__ == "__main__":
-
-	# Capa 1 = capa con 2 entradas conectadas a 8neuronas que a la vez se conectan a 1 neurona de salida
-	layer_model = [
-		NeuronLayer(2, 8),
-		NeuronLayer(8, 1)
-	]
-
-	# Se asigna el modelo de capas a la red
-	neural_network = NeuralNetwork(layer_model)
-
-	def xor_problem():
-		# definicion del set de entrenamiento problema XOR
-		inputs = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
-		outputs = np.array([[0],  [1],   [1],   [0]])
-
-		# entrenamiento
-		neural_network.train(inputs, outputs, 1200)
-		neural_network.learn_rate = 0.01
-		# test
-		print(neural_network.input(inputs)) 
-		neural_network.show_error()
-
-	xor_problem()

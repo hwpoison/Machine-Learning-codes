@@ -38,31 +38,38 @@ ts_output_iris = np.array([[specs[1]
                             for specs in iris_dataset]])[0]  # expected output data
 
 model = [
-    NeuronLayer(4, 8),
-    NeuronLayer(8, 3)
+    NeuralLayer(4, 8),
+    NeuralLayer(8, 3)
 ]
 neural_network = NeuralNetwork(model)
-neural_network.learn_rate = 0.01
-neural_network.train(ts_input_iris, ts_output_iris, 6000)
+neural_network.learn_rate = 0.001
+neural_network.train(ts_input_iris, ts_output_iris, 5000)
 
 print(neural_network.errors[-1])
 
 
 def test_all():
     cout = 0
+    ok = fails = 0
     for ts_input, expected in zip(ts_input_iris, ts_output_iris):
         output = neural_network.input(ts_input)
-        iris_type = np.argmax(output)
+        iris_type = np.rint(output)
         iris_type_name = "Unknow"
-        if(iris_type == 0):
+        if iris_type[0]:
             iris_type_name = "Setosa"
-        elif(iris_type == 1):
+        elif iris_type[1]:
             iris_type_name = "Versicolor"
-        elif(iris_type == 2):
+        elif iris_type[2]:
             iris_type_name = "Virginica"
-        print(f'{cout})Input:{ts_input} Output: {iris_type} = {iris_type_name}')
+        validation = 1 if (np.rint(expected) == iris_type).all() else 0
+        if validation:
+            ok+=1
+        else:
+            fails+=1
+    
+        print(f'{cout})Input:{ts_input} Output: {output} = {iris_type_name} { validation }  ')
         cout += 1
-
-
+    print(f"[ OK:{ ok } Fail:{ fails } ]")
+    neural_network.show_error()
 test_all()
-neural_network.show_error()
+
