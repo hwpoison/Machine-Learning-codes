@@ -1,9 +1,15 @@
+import os
 from tkinter import *
+from tkinter import messagebox
+
+import pickle as cPickle
+from random import shuffle
 import numpy as np
-import multilayer_perceptron as perceptron
+
+import multilayer_perceptron as nn
 
 __autor__ = 'hwpoison'
-__date__ = '20/07/2019'
+__date__ = '25/07/2022'
 
 """
 Controles:
@@ -16,20 +22,24 @@ ya estaba previamente activada.
 
 ##MLP  Parameters##
 # Input matrix
-GRID_WIDTH = 8
+GRID_WIDTH = 7
 GRID_HEIGHT = 8
+# Data
+CHARACTERS_SET = "_ABCDEFGHIJKLMNÑOPQRSTUVWXYZ0123456789!"
+MODEL_FILE_NAME = "brain.saved"
 # Layer
-HIDDEN_LAYER = 10
+HIDDEN_LAYER = 20
 # Train settings
-LEARN_RATE = 0.5
-TRAIN_EPOCHS = 2500
+LEARN_RATE = 0.001
+DEFAULT_ACTIVATION = 'tanh'
+TRAIN_EPOCHS = 1200
 ###################
 ##GUI Options##
-CELL_SIZE = 6
+CELL_SIZE = 4
 COLOR_ENABLED = '#1EFF1A'
 COLOR_DISABLED = '#35A4E7'
 
-TEXT_TITLE = "MLP by " + __autor__
+TEXT_TITLE = "MLP v2 by " + __autor__
 TEXT_TRAIN = "Entrenar"
 TEXT_PREDICT = "Predecir"
 
@@ -38,11 +48,10 @@ TEXT_FORGET_DESC = "Reinicia la red"
 
 TEXT_CLEAR = "Limpiar"
 TEXT_CLEAR_DESC = "Resetea los valores de la grilla"
-
+TEXT_EXPECTED_OUTPUT = "Por favor, introducir una salida esperada."
 TEXT_REFORCE = "Refuerzo"
 TEXT_REFORCE_DESC = "Por cada entrenamiento, refuerza el \
-aprendizaje repasando nuevamente\n"
-TEXT_REFORCE_DESC += "las muestras presentadas anteriormente."
+aprendizaje repasando nuevamente las muestras previamente enseñadas.\n"
 
 
 class InputGrid(Frame):
@@ -57,13 +66,13 @@ class InputGrid(Frame):
         self.init_grid()
         self.grid(row=1, column=0)
 
-    def addButton(self, text):
+    def create_button(self, text):
         # Genera un boton y asigna evento de estado
         boton = Button(self,
                        width=CELL_SIZE,
                        height=int(CELL_SIZE/2),
                        bg=COLOR_DISABLED,
-                       bd=5,
+                       bd=1,
                        # text=str(text)
                        )
         boton.bind('<Enter>', lambda x: self.update_input(boton, mode='enter'))
@@ -115,7 +124,7 @@ class InputGrid(Frame):
         control = 0
         for x in range(self.width):
             for y in range(self.height):
-                button = self.addButton(control)
+                button = self.create_button(control)
                 button.grid(row=y, column=x)
                 self.button_grid[button] = 0
                 control += 1
@@ -165,13 +174,14 @@ class CreateToolTip(object):
 class App(object):
     def __init__(self):
         self.window = Tk()
-        self.panel_inputs = InputGrid(GRID_WIDTH, GRID_HEIGHT)
-        self.Perceptron = None
-        self.reinforcement_data = IntVar()
-        self.input_data = []
-        self.output_data = []
+        self.NeuralNetwork = None
+        self.reinforcement_data_check = IntVar()
+        self.net_prediction_label = StringVar()
+        self.batch =  []
+        self.characters = CHARACTERS_SET
+        self.expected_output = None
+        self.init_nnetwork()
         self.init_panel()
-        self.init_perceptron()
         self.init_window()
 
     def init_window(self):
@@ -188,53 +198,133 @@ class App(object):
         self.window.mainloop()
 
     def predict(self):
-        result = self.Perceptron.input(self.panel_inputs.get_inputs())
-        self.clear()
-        print("Salida actual de la red:")
-        print(np.around(result, decimals=GRID_WIDTH*GRID_HEIGHT))
-        self.panel_inputs.draw(result)
+        # passing the grid matrix to the network
+        result = self.NeuralNetwork.input(self.panel_inputs.get_inputs())
+        raw_output = np.around(result, decimals=GRID_WIDTH*GRID_HEIGHT)
+        self.panel_inputs.predicting_control = True
 
+        print("Salida actual de la red:")
+        print(raw_output)
+
+        # print top 5 characters
+        dtype = [("character",object),("activation",float) ]
+        probabilities = np.array(list(zip(self.characters, raw_output)), dtype=dtype)
+        top_5 = np.sort(probabilities, order='activation')[::-1][:5]
+        print("*****Top 5*****")
+        for character, activation in top_5:
+            print(f"{character} => {activation}")
+        print("***************")
+        predicted_letter = self.characters[self.characters.index(top_5[0][0])]
+        print("Predicted:" , predicted_letter)
+        self.net_prediction_label.set(" - ".join([f" {charc}({fire:.2f})" for charc, fire in top_5[:3]]) )
+        
     def train(self):
         print("Aprendiendo...", end="")
         panel_inputs = self.panel_inputs.get_inputs()
         net_input = np.array(panel_inputs)
         net_expect = np.array(panel_inputs)
-        self.input_data.append(net_input)
-        self.output_data.append(net_expect)
-        if not self.reinforcement_data.get():
-            self.Perceptron.train(np.asarray([net_input]),
-                                  np.asarray([net_expect]))
+        
+        expected_output = self.expected_output.get().upper()
+        if not expected_output or not expected_output in self.characters:
+            messagebox.showerror("Error",f"{TEXT_EXPECTED_OUTPUT} ({self.characters})")
+            return
+
+        index = self.characters.index(expected_output)
+
+        net_expect = np.zeros(len(self.characters))
+        net_expect[index] = 1
+        
+        self.batch.append([net_input, net_expect])
+        shuffle(self.batch)
+
+        if not self.reinforcement_data_check.get():
+            # online training
+            self.NeuralNetwork.train(np.asarray(net_input), np.asarray(net_expect))
         else:
-            self.Perceptron.train(np.asarray(self.input_data),
-                                  np.asarray(self.output_data),
-                                  epoch_number=TRAIN_EPOCHS)
-        print(f"Minimo local conseguido:", self.Perceptron.errors[-1])
-        print(" Listo!")
+            # batch training
+            self.NeuralNetwork.train(
+                np.asarray([x[0] for x in self.batch]), 
+                np.asarray([x[1] for x in self.batch]), TRAIN_EPOCHS)
+
+        print(f"Minimo local conseguido:", self.NeuralNetwork.results['MSE'][-1])
+        print("Listo!")
+        
+        self.save_profile()
         self.panel_inputs.reset()
 
-    def init_perceptron(self):
-        input_len = len(self.panel_inputs.get_inputs())
-        # Red neuronal de 3 capas
+    def save_profile(self):
+        # save model status with his weights and grid preferences.
+        actual_profile = {
+            "model":self.NeuralNetwork,
+            "gui_grid_width":GRID_WIDTH,
+            "gui_grid_height":GRID_HEIGHT,
+            "hidden_layer_size":HIDDEN_LAYER,
+            "learn_rate":LEARN_RATE,
+            "train_epochs":TRAIN_EPOCHS,
+            "characters_set": CHARACTERS_SET
+        }
+
+        with open(MODEL_FILE_NAME, "wb") as save_profile_file:
+            cPickle.dump(actual_profile, save_profile_file)
+            print("Cambios guardados..")
+
+    def detect_saved_profile(self):
+        if os.path.exists(MODEL_FILE_NAME):
+            return True
+        return False 
+
+    def load_profile(self):
+        global GRID_WIDTH, GRID_HEIGHT, TRAIN_EPOCHS, CHARACTERS_SET
+        # load profile from file
+        print("Cargando perfil guardado...")
+        with open(MODEL_FILE_NAME, "rb") as load_profile:
+            loaded_profile = cPickle.load(load_profile)
+
+        # set gui preferences
+        GRID_WIDTH = loaded_profile['gui_grid_width']
+        GRID_HEIGHT = loaded_profile['gui_grid_height']
+        TRAIN_EPOCHS = loaded_profile['train_epochs']
+        CHARACTERS_SET = loaded_profile['characters_set']
+        # load nn status
+        self.NeuralNetwork = loaded_profile['model']
+
+        print("Modelo cargado desde archivo.")
+
+    def init_nnetwork(self):
+        # Red neuronal de HIDDEN_LAYER capas
         # 1: capa oculta de HIDDEN_LAYER neuronas,
         #   con (GRID_WEIGHT*GRID_HEIGHT) entradas cada una
         # 2: salida de (GRID_WEIGHT*GRID_HEIGHT) neuronas
+
+        if self.detect_saved_profile():
+            self.load_profile()
+            return True
+
+        input_len = GRID_HEIGHT*GRID_WIDTH
+        output_len = len(self.characters)
+
         model = [
-            perceptron.NeuralLayer(input_len, HIDDEN_LAYER),
-            perceptron.NeuralLayer(HIDDEN_LAYER, input_len),
+            nn.NeuralLayer(input_len, HIDDEN_LAYER), # input layer
+            nn.NeuralLayer(HIDDEN_LAYER, output_len), # output layer
         ]
+        self.NeuralNetwork = nn.NeuralNetwork(model)
+        self.NeuralNetwork.learn_rate = LEARN_RATE
+        self.NeuralNetwork.default_activation = DEFAULT_ACTIVATION
+
         print(f"Red Neuronal inicializada.")
-        self.Perceptron = perceptron.NeuralNetwork(model)
-        self.Perceptron.learn_rate = LEARN_RATE
-        self.panel_inputs.reset()
+
+        return True 
 
     def forget(self):
         print("Olvidando...")
-        self.init_perceptron()
+        os.remove("saved_model.pickle")
+        self.init_nnetwork()
 
     def clear(self):
         self.panel_inputs.reset()
 
     def init_panel(self):
+        self.panel_inputs = InputGrid(GRID_WIDTH, GRID_HEIGHT)
         control = Frame(self.window)
         Button(control, text=TEXT_TRAIN,
                command=lambda: self.train()).pack(side=LEFT)
@@ -252,12 +342,20 @@ class App(object):
         forget_btn.pack(side=LEFT)
 
         reinforcement_chk = Checkbutton(
-            control, text=TEXT_REFORCE, variable=self.reinforcement_data)
+            control, text=TEXT_REFORCE, variable=self.reinforcement_data_check)
         reinforcement_chk.select()
         CreateToolTip(reinforcement_chk, TEXT_REFORCE_DESC)
         reinforcement_chk.pack(side=LEFT)
+        Label(control, text="|").pack(side=LEFT)
+        Label(control, text="Salida Esperada:").pack(side=LEFT)
+        self.expected_output = Entry(control)
+        self.expected_output.pack(side=RIGHT)
+        control.grid(column=0, row=0, pady=10, padx=10)
 
-        control.grid(column=0, row=0)
+        # bottom labels
+        Label(self.window, text="Predición:").grid(column=0, row=4)
+        Label(self.window, textvar=self.net_prediction_label, font=("Arial", 15)).grid(column=0, row=5)
+        self.net_prediction_label.set("...")
 
 
 if __name__ == '__main__':

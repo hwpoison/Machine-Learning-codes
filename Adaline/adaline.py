@@ -5,7 +5,7 @@ from random import shuffle
 import numpy as np
 import time
 
-__autor__ = 'srbill1996'
+__autor__ = 'hwpoison'
 
 
 class Adaline():
